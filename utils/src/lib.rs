@@ -3,7 +3,7 @@ use std::fs::{self, File};
 use std::io;
 
 ///Reads a typical aoc file and returns a vector of strings which represent the lines inside
-pub fn str_to_vec(path: &str) -> Result<Vec<String>, Box<dyn Error>> {
+pub fn file_to_vec_str(path: &str) -> Result<Vec<String>, Box<dyn Error>> {
     let content = fs::read_to_string(path)?;
     let list: Vec<String> = content
         .lines()
@@ -14,8 +14,8 @@ pub fn str_to_vec(path: &str) -> Result<Vec<String>, Box<dyn Error>> {
 }
 
 //parse file with list of nums to vec
-pub fn str_to_vec_nums(path: &str) -> Result<Vec<i32>, Box<dyn Error>> {
-    let str_list = str_to_vec(path)?;
+pub fn file_to_vec_int(path: &str) -> Result<Vec<i32>, Box<dyn Error>> {
+    let str_list = file_to_vec_str(path)?;
     //TODO: Improve this in a more 'idiomatic' way?
     let mut int_list : Vec<i32> = vec![];
     str_list.iter().for_each(|e| int_list.push(e.parse::<i32>().expect("Couldn't parse str to int")));
@@ -29,10 +29,10 @@ mod tests {
 
     #[test]
     fn it_works() -> Result<(), Box<dyn Error>> {
-        let result = str_to_vec("./test.txt")?;
+        let result = file_to_vec_str("./test.txt")?;
         assert_eq!(result.len(), 7);
 
-        let result = str_to_vec_nums("./nums.txt")?;
+        let result = file_to_vec_int("./nums.txt")?;
         assert_eq!(result.len(), 10);
         Ok(())
     }
