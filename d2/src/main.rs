@@ -2,7 +2,6 @@ use std::error::Error;
 use utils::file_to_vec_str;
 
 fn parse_num_list_as_vec(list_lines: Vec<String>) -> Result<Vec<Vec<i32>>, Box<dyn Error>> {
-    // let mut report_as_str: Vec<Vec<&str>> = vec![];
 
     //get vector of reports as strings
     //TODO: Utilize slices to avoid increased space complexity?
@@ -26,7 +25,6 @@ fn parse_num_list_as_vec(list_lines: Vec<String>) -> Result<Vec<Vec<i32>>, Box<d
 }
 
 fn is_safe(report: &Vec<i32>) -> bool {
-    //TODO: Main logic man
     let slice_size = 2; //we'll compare the distance adjacent elements, hence we use a sliding
                         //window
     let window = report.windows(slice_size);
@@ -56,27 +54,72 @@ fn is_safe(report: &Vec<i32>) -> bool {
     // println!("{:?} => {}", vec, is_safe);
 }
 
-fn part_one(reports: Vec<Vec<i32>>) -> i32 {
+fn part_one(reports: &Vec<Vec<i32>>) -> i32 {
     let mut safe_count = 0;
     reports
         .into_iter()
         .for_each(|report| match is_safe(&report) {
             true => safe_count += 1,
-            false => (),
+            _ => (),
         });
     safe_count
 }
 
 fn part_two(reports: Vec<Vec<i32>>) -> i32 {
-    reports.into_iter().for_each(|vec| todo!());
+    let mut safe_report_count = 0;
+    reports.into_iter().for_each(|report| {
+        let mut is_safe_flag = false;
+        for (i, _) in report.as_slice().iter().enumerate() {
+
+            //Iterate through each element
+            //Check if it is safe by removing the ith element
+            //If it manages to be safe by removing it any element
+            //else it is deemed as unsafe
+
+            //try with slice without first level
+            if i == 0 {
+                is_safe(&report[i + 1..].to_vec()).then(|| {
+                    is_safe_flag = true;
+                });
+
+            //try with slice without last level
+            } else if i == (report.len() - 1) {
+                is_safe(&report[..i].to_vec()).then(|| {
+                    is_safe_flag = true;
+                });
+            } else {
+                //try with sliced report without level in the middle
+                //skip ith, so do a partition into two
+                let p1 = &report[..i];
+                let p2 = &report[i + 1..];
+
+                //concat slices into vector
+                is_safe(&[p1, p2].concat().to_vec()).then(|| {
+                    is_safe_flag = true;
+                    true
+                });
+            }
+        }
+
+        is_safe_flag.then(|| {
+            safe_report_count += 1;
+        });
+    });
+
+    safe_report_count
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
     let input = file_to_vec_str("p1-input.txt").expect("Error while reading input");
     let reports = parse_num_list_as_vec(input)?;
 
-    let res = part_one(reports);
-    println!("{res}");
+    let res = part_one(&reports);
+    println!("P1: {res}");
+
+    let input = file_to_vec_str("p2-input.txt").expect("Error while reading input");
+    let reports = parse_num_list_as_vec(input)?;
+    let res = part_two(reports);
+    println!("P2: {res}");
 
     Ok(())
 }
