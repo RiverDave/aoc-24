@@ -1,8 +1,10 @@
 use std::error::Error;
 use utils::file_to_vec_str;
 
-fn parse_num_list_as_vec(list_lines: Vec<String>) -> Result<Vec<Vec<i32>>, Box<dyn Error>> {
+type Reports = Vec<Vec<i32>>;
+type Report = Vec<i32>;
 
+fn parse_str_list_as_num_vec(list_lines: Vec<String>) -> Result<Reports, Box<dyn Error>> {
     //get vector of reports as strings
     //TODO: Utilize slices to avoid increased space complexity?
     let report_as_str: Vec<Vec<String>> = list_lines
@@ -12,7 +14,7 @@ fn parse_num_list_as_vec(list_lines: Vec<String>) -> Result<Vec<Vec<i32>>, Box<d
 
     //String to num conversion inside each listed of reports :?>:?
     //["1", "2", "3"] ->  [1, 2, 3]
-    let vec_list: Vec<Vec<i32>> = report_as_str
+    let vec_list: Reports = report_as_str
         .into_iter()
         .map(|vec| {
             vec.into_iter()
@@ -24,7 +26,7 @@ fn parse_num_list_as_vec(list_lines: Vec<String>) -> Result<Vec<Vec<i32>>, Box<d
     Ok(vec_list)
 }
 
-fn is_safe(report: &Vec<i32>) -> bool {
+fn is_safe(report: &Report) -> bool {
     let slice_size = 2; //we'll compare the distance adjacent elements, hence we use a sliding
                         //window
     let window = report.windows(slice_size);
@@ -54,7 +56,7 @@ fn is_safe(report: &Vec<i32>) -> bool {
     // println!("{:?} => {}", vec, is_safe);
 }
 
-fn part_one(reports: &Vec<Vec<i32>>) -> i32 {
+fn part_one(reports: &Reports) -> i32 {
     let mut safe_count = 0;
     reports
         .into_iter()
@@ -65,12 +67,12 @@ fn part_one(reports: &Vec<Vec<i32>>) -> i32 {
     safe_count
 }
 
-fn part_two(reports: Vec<Vec<i32>>) -> i32 {
+//brute force approach, O(n^2) time complexity
+fn part_two(reports: Reports) -> i32 {
     let mut safe_report_count = 0;
     reports.into_iter().for_each(|report| {
         let mut is_safe_flag = false;
         for (i, _) in report.as_slice().iter().enumerate() {
-
             //Iterate through each element
             //Check if it is safe by removing the ith element
             //If it manages to be safe by removing it any element
@@ -111,13 +113,14 @@ fn part_two(reports: Vec<Vec<i32>>) -> i32 {
 
 fn main() -> Result<(), Box<dyn Error>> {
     let input = file_to_vec_str("p1-input.txt").expect("Error while reading input");
-    let reports = parse_num_list_as_vec(input)?;
+    let reports = parse_str_list_as_num_vec(input)?;
 
     let res = part_one(&reports);
     println!("P1: {res}");
 
     let input = file_to_vec_str("p2-input.txt").expect("Error while reading input");
-    let reports = parse_num_list_as_vec(input)?;
+    let reports = parse_str_list_as_num_vec(input)?;
+
     let res = part_two(reports);
     println!("P2: {res}");
 
