@@ -1,5 +1,5 @@
-use std::fs;
 use regex::Regex;
+use std::fs;
 
 //Experimenting with regex:
 fn part_one(input: &str) -> i32 {
@@ -30,18 +30,18 @@ fn part_two(input: &str) -> i32 {
 
     let mut operate: bool = true;
     let mut sum = 0;
+    //I could certainly use a more elegant solution, but this will sufice
     re.captures_iter(input).into_iter().for_each(|e| {
-        match e.get(4) { //This should be do or don't
+        match e.get(4) {
+            //This should be do or don't
             Some(exp) => {
                 match exp.as_str() {
                     "do()" => operate = true,
                     "don't()" => operate = false,
-                    _ => ()
-
+                    _ => (),
                 };
-
-            },
-            None => ()
+            }
+            None => (),
         };
 
         println!("{:?}", e);
@@ -49,7 +49,6 @@ fn part_two(input: &str) -> i32 {
             Some(exp) => {
                 match operate {
                     true => {
-
                         // assert_eq!(exp.as_str(), "do");
                         sum += e.get(2).unwrap().as_str().parse::<i32>().unwrap()
                             * e.get(3).unwrap().as_str().parse::<i32>().unwrap();
@@ -62,25 +61,13 @@ fn part_two(input: &str) -> i32 {
         };
     });
 
-    //If we find do:
-    //Closest mul is performed
-    //If we don't
-    //Don't perform any operation
-
-    //thought:
-    //group the following matches,
-    //(do) & (don't)
-    //mul operations
-    //Toggle flag that will perform the operation
 
     sum
 }
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // let input = fs::read_to_string("p1-input.txt").expect("Failed to read input");
-    // println!("input:\n {:?}", input);
-
-    // let res = part_one(&input);
-    // println!("P1: {res}");
+    let input = fs::read_to_string("p1-input.txt").expect("Failed to read input");
+    let res = part_one(&input);
+    println!("P1: {res}");
 
     let input = fs::read_to_string("p2-input.txt").expect("Failed to read input");
     let res = part_two(&input);
